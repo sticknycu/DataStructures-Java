@@ -1,6 +1,7 @@
 package ro.nicolaemariusghergu.sda;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Main {
 
@@ -731,9 +732,168 @@ public class Main {
         integerLinkedList.printList();
 
 
+        System.out.println("----> Stacks <----");
+
+        // Stack
+        // Abstract data type
+        // LIFO - Last in, first out
+        // push - adds an item as the top item on the stack
+        // pop - removes the top item on the stack
+        // peek - gets the top item on the stack without popping it
+        // Ideal backing data structure: linked list
+
+        // O(1) for push, pop and peek, when using a linked list
+        // if u use an array, then push is O(n), because the array
+        // may have to be resized
+        // If you know the maximum number of items that will
+        // ever be on the stack, an array can be a good choise
+        // if memory is tight, an array might be a good choice
+        // Linked list is ideal
+
+        class ArrayStack {
+
+            private Employee[] stack;
+            private int top;
+
+            public ArrayStack(int capacity) {
+                stack = new Employee[capacity];
+            }
+
+            public void push(Employee employee) {
+                if (top == stack.length) {
+                    // need to resize the backing array
+                    Employee[] newArray = new Employee[2 * stack.length];
+                    System.arraycopy(stack, 0, newArray, 0, stack.length);
+                    stack = newArray;
+                }
+
+                stack[top++] = employee;
+            }
+
+            public Employee pop() {
+                if (isEmpty()) {
+                    throw new EmptyStackException();
+                }
+
+                Employee employee = stack[--top];
+                stack[top] = null;
+                return employee;
+            }
+
+            public Employee peek() {
+                if (isEmpty()) {
+                    throw new EmptyStackException();
+                }
+
+                return stack[top - 1];
+            }
+
+            public int size() {
+                return top;
+            }
+
+            public boolean isEmpty() {
+                return top == 0;
+            }
+
+            public void printStack() {
+                for (int i = top - 1; i >= 0; i--) {
+                    System.out.println(stack[i]);
+                }
+            }
+        }
 
 
+        ArrayStack stack = new ArrayStack(10);
 
+        stack.push(new Employee("Jane", "Jones", 123));
+        stack.push(new Employee("John", "Doe", 4567));
+        stack.push(new Employee("Mary", "Smith", 22));
+        stack.push(new Employee("Mike", "Wilson", 3245));
+        stack.push(new Employee("Bill", "End", 78));
+
+        stack.printStack();
+        System.out.println("Peek: ");
+        System.out.println(stack.peek());
+        System.out.println("Pop: ");
+        System.out.println(stack.pop());
+
+        class LinkedStack {
+            private LinkedList<Employee> stack;
+
+            public LinkedStack() {
+                stack = new LinkedList<>();
+            }
+
+            public void push(Employee employee) {
+                stack.push(employee);
+            }
+
+            public Employee pop() {
+                return stack.pop();
+            }
+
+            public Employee peek() {
+                return stack.peek();
+            }
+
+            public boolean isEmpty() {
+                return stack.isEmpty();
+            }
+
+            public void printStack() {
+                ListIterator<Employee> iterator = stack.listIterator();
+                while (iterator.hasNext()) {
+                    System.out.println(iterator.next());
+                }
+            }
+        }
+
+        System.out.println("----> Linked List Stack <----");
+
+        // constant time O(1) working with LinkedList
+        LinkedStack linkedStack = new LinkedStack();
+        linkedStack.push(janeJones);
+        linkedStack.push(johnDoe);
+        linkedStack.push(marySmith);
+        linkedStack.push(mikeWilson);
+        linkedStack.push(billEnd);
+
+        linkedStack.printStack();
+        System.out.println("Peek: " + linkedStack.peek());
+        linkedStack.printStack();
+        System.out.println("Pooped: " + linkedStack.pop());
+        linkedStack.printStack();
+
+        // Stack Challenge
+        // Using a stack, determine whether a string is palindrome
+        // Strings may contain punctuation and spaces. They should be ignored
+        // Case should be ignored
+
+        System.out.println(checkForPalindrome("aabbaa"));
+
+    }
+
+    public static boolean checkForPalindrome(String string) {
+        StringBuilder stringBuilder = new StringBuilder(string.length());
+        String lowerCase = string.toLowerCase();
+
+        LinkedList<Character> stack = new LinkedList<>();
+
+        for (int i = 0; i < lowerCase.length(); i++) {
+            char c = lowerCase.charAt(i);
+            if (c >= 'a' && c <= 'z') {
+                stringBuilder.append(c);
+                stack.push(c);
+            }
+        }
+
+        StringBuilder reversedString = new StringBuilder(stack.size());
+        while (!stack.isEmpty()) {
+            reversedString.append(stack.pop());
+        }
+
+        return reversedString.toString().equals(stringBuilder.toString());
     }
 
     public static void radixSort(int[] input, int min, int max) {
