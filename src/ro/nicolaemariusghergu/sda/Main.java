@@ -872,6 +872,305 @@ public class Main {
 
         System.out.println(checkForPalindrome("aabbaa"));
 
+
+        System.out.println("----> Queues <----");
+
+        // Abstract data type
+        // FIFO - first in, first out
+        // add - also called enqueue - add an item to the end of the queue
+        // remove - also called dequeue - remove the item at the front of the queue
+        // peek - get the item at the front of the queue, but don't remove it
+
+        // O(n) if implementation use array
+        // O(1) if implementation use linked lists
+        // exactly as stacks
+
+        class ArrayQueue {
+            private Employee[] queue;
+            private int front;
+            private int back;
+
+            public ArrayQueue(int capacity) {
+                queue = new Employee[capacity];
+            }
+
+            public void add(Employee employee) {
+                // queue is full
+                // resize again and again if we remove and add again and again
+                // see Circular Queue for optimization
+                if (back == queue.length) {
+                    Employee[] newArray = new Employee[2 * queue.length];
+                    System.arraycopy(queue, 0, newArray, 0, queue.length);
+                    queue = newArray;
+                }
+
+                queue[back] = employee;
+
+                back++;
+            }
+
+            public Employee remove() {
+                if (size() == 0) {
+                    throw new NoSuchElementException();
+                }
+
+                Employee employee = queue[front];
+                queue[front] = null;
+                front++;
+                // if we deleted single item from queue we can reset those
+                if (size() == 0) {
+                    front = 0;
+                    back = 0;
+                }
+
+                return employee;
+            }
+
+            public Employee peek() {
+                if (size() == 0) {
+                    throw new NoSuchElementException();
+                }
+
+                return queue[front];
+            }
+
+            public int size() {
+                return back - front;
+            }
+
+            public void printQueue() {
+                for (int i = front; i < back; i++) {
+                    System.out.println(queue[i]);
+                }
+                //for (Employee employee : queue) {
+                //    System.out.println(employee);
+                //}
+            }
+        }
+
+        ArrayQueue arrayQueue = new ArrayQueue(10);
+        arrayQueue.add(janeJones);
+        arrayQueue.add(johnDoe);
+        arrayQueue.add(marySmith);
+        arrayQueue.add(mikeWilson);
+        arrayQueue.add(billEnd);
+
+        arrayQueue.printQueue();
+
+        System.out.println("---------------");
+        System.out.println("Removing 2 items from Array Queue:");
+        arrayQueue.remove();
+        arrayQueue.remove();
+
+        arrayQueue.printQueue();
+
+        System.out.println("-----------------");
+
+        System.out.println("Peek: " + arrayQueue.peek());
+
+        System.out.println("----------------");
+        System.out.println("Deleting the remaining 3 items");
+        for (int i = 0; i < 3; i++) {
+            arrayQueue.remove();
+        }
+        arrayQueue.printQueue();
+
+        // if we remove now, we will get a NoSuchElementException
+        //arrayQueue.remove();
+
+        System.out.println("Something wrong with implementation so let's see -->");
+        arrayQueue.add(janeJones);
+        arrayQueue.add(johnDoe);
+        arrayQueue.remove();
+        arrayQueue.add(marySmith);
+        arrayQueue.remove();
+        arrayQueue.add(mikeWilson);
+        arrayQueue.printQueue();
+
+        System.out.println("----> Circular Queue <----");
+
+        class CircularQueue {
+            private Employee[] queue;
+            private int front;
+            private int back;
+
+            public CircularQueue(int capacity) {
+                queue = new Employee[capacity];
+            }
+
+            public void add(Employee employee) {
+                // queue is full
+                // OLD: back == queue.length --> will resize again and again if we remove and add again and again
+                if (size() == queue.length - 1) {
+                    int numItems = size();
+                    Employee[] newArray = new Employee[2 * queue.length];
+
+                    System.arraycopy(queue, front, newArray, 0, queue.length - front);
+                    System.arraycopy(queue, 0, newArray, queue.length - front, back);
+
+                    queue = newArray;
+
+                    front = 0;
+                    back = numItems;
+                }
+
+                // 0
+                // 1 - john -- front
+                // 2  - mary
+                // 3  // back
+                // 4
+                // 5
+                // 6
+                // 7
+                // ..
+                // 9
+
+                queue[back] = employee;
+                // optimization
+                if (back < queue.length - 1) {
+                    back++;
+                } else {
+                    back = 0;
+                }
+            }
+
+            public Employee remove() {
+                if (size() == 0) {
+                    throw new NoSuchElementException();
+                }
+
+                Employee employee = queue[front];
+                queue[front] = null;
+                front++;
+                // if we deleted single item from queue we can reset those
+                if (size() == 0) {
+                    front = 0;
+                    back = 0;
+                } else if (front == queue.length) {
+                    front = 0;
+                }
+
+                return employee;
+            }
+
+            public Employee peek() {
+                if (size() == 0) {
+                    throw new NoSuchElementException();
+                }
+
+                return queue[front];
+            }
+
+            public int size() {
+                if (front <= back) {
+                    return back - front;
+                } else {
+                    return back - front + queue.length;
+                }
+            }
+
+            public void printQueue() {
+                if (front <= back) {
+                    for (int i = front; i < back; i++) {
+                        System.out.println(queue[i]);
+                    }
+                } else {
+                    for (int i = front; i < queue.length; i++) {
+                        System.out.println(queue[i]);
+                    }
+                    for (int i = 0; i < back; i++) {
+                        System.out.println(queue[i]);
+                    }
+                }
+                //for (Employee employee : queue) {
+                //    System.out.println(employee);
+                //}
+            }
+        }
+
+
+
+        CircularQueue circularQueue = new CircularQueue(4);
+        circularQueue.add(janeJones);
+        circularQueue.add(johnDoe);
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("----------REMOVE----------");
+        circularQueue.remove();
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("-----------ADD-------");
+        circularQueue.add(marySmith);
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("-----------REMOVE-------");
+        circularQueue.remove();
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("---------ADD----------");
+        circularQueue.add(mikeWilson);
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("---------REMOVE----------");
+        circularQueue.remove();
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("------------ADD------");
+        circularQueue.add(billEnd);
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("----------REMOVE--------");
+        circularQueue.remove();
+        circularQueue.printQueue();
+        System.out.println(circularQueue.size());
+        System.out.println("---------------------");
+
+        System.out.println("----> JDK Queues <----");
+        // about ConcurrentLinkedQueue and ConcurrentArrayQueue -- documentation
+        // ConcurrentLinkedQueue::size() is not constant time
+
+        // Deque interface -- Double ended queue
+
+        // Queues challenge
+        // Using a stack and a queue, determine whether a string is a palindrome
+        // stirng may contain punctuation and spaces. They should be ignored.
+        // Case should be ignore
+
+        System.out.println("Challenge Queues: ");
+
+        System.out.println("Check for palindrome using a stack and a queue: ");
+        System.out.println("aabbaa: " + checkForPalindromeQueueAndStack("aabbaa"));
+        System.out.println("dad: " + checkForPalindromeQueueAndStack("dad"));
+        System.out.println("dade: " + checkForPalindromeQueueAndStack("dade"));
+
+
+
+
+    }
+
+    public static boolean checkForPalindromeQueueAndStack(String string) {
+        String lowerCase = string.toLowerCase();
+
+        LinkedList<Character> linkedStack = new LinkedList<>();
+        LinkedList<Character> linkedQueue = new LinkedList<>();
+        for (int i = 0; i < lowerCase.length(); i++) {
+            char c = lowerCase.charAt(i);
+            if (c >= 'a' && c <= 'z') {
+                linkedStack.push(c);
+                linkedQueue.add(c);
+            }
+        }
+
+        for (int i = 0; i < lowerCase.length(); i++) {
+            char c = lowerCase.charAt(i);
+            if (c >= 'a' && c <= 'z') {
+                if (!linkedStack.pop().equals(linkedQueue.remove())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public static boolean checkForPalindrome(String string) {
