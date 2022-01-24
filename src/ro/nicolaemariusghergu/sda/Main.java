@@ -1,7 +1,7 @@
 package ro.nicolaemariusghergu.sda;
 
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
 
@@ -246,7 +246,7 @@ public class Main {
             }
         }
 
-        class EmployeeLinkedList {
+        class hashMap {
 
             private EmployeeNode head;
             private int size;
@@ -289,7 +289,7 @@ public class Main {
             }
         }
 
-        EmployeeLinkedList list = new EmployeeLinkedList();
+        hashMap list = new hashMap();
         list.addToFront(janeJones);
         list.addToFront(johnDoe);
         list.addToFront(marySmith);
@@ -1143,9 +1143,416 @@ public class Main {
         System.out.println("dad: " + checkForPalindromeQueueAndStack("dad"));
         System.out.println("dade: " + checkForPalindromeQueueAndStack("dade"));
 
+        System.out.println("----> Hash tables <----");
+
+        // abstract data type
+        // provide access to data using keys
+        // key doesn't have to be an integer
+        // consists of key/value pairs - data types don't have to match
+        // optimized for retrieval (when you know the key)
+        // associative array is one type of hash table
+
+
+        // Hashing
+        // Maps keys of any data type to an integer
+        // Hash function maps keys to int
+        // In Java, hash function is Object.hashCode()
+        // Collision occurs when more than one value has the same hashed value
+
+        // Load Factor
+        // Tells us how full a hash table is
+        // Load factor = # of items / capacity = size / capacity
+        // Load factor is used to decide when to resize the array backing the hash table
+        // Don't want load factor too low (lots of empty space)
+        // Don't want load factor too high (will increase the likelihood of collisions)
+        // Can play a role in determining the time complexity for retrieval
+
+        // Add to a Hash Table backed by an array
+        // 1) Provide a key/value pair
+        // 2) Use a hash function to hash the key to an int value
+        // 3) Store the value at the hashed key value - this is the index into the array
+
+        // Retrieve a value from a hash table
+        // 1) Provide the key
+        // 2) Use the same hash function to hash the key to an int value
+        // 3) Retrieve the value stored at the hashed key value
+
+
+        // Add "Jane Jones" with key of "Jones"
+        // 1) Use a hash function to map "Jones" to an int - let's assume we get the value 4
+        // 2) Store "Jane "Jones" at array[4]
+
+        // Retrieve the employee with key "Jones"
+        // 1) Provide the key "Jones"
+        // 2) Use the same hash function to map "Jones" to an int - let's assume we get the value 4
+        // 3) Retrieve the value at array[4] -> "Jane Jones"
+
+        // Array implementation of Singly Hash tables
+
+        class StoredEmployee {
+            public String key;
+            public Employee employee;
+
+            public StoredEmployee(String key, Employee employee) {
+                this.key = key;
+                this.employee = employee;
+            }
+        }
+
+        class SimpleHashTable {
+            private StoredEmployee[] hashtable;
+
+            public SimpleHashTable(int capacity) {
+                hashtable = new StoredEmployee[capacity];
+            }
+
+            public void put(String key, Employee employee) {
+                int hashedKey = hashKey(key);
+                if (occupied(hashedKey)) {
+                    int stopIndex = hashedKey;
+                    if (hashedKey == hashtable.length - 1) {
+                        hashedKey = 0;
+                    } else {
+                        hashedKey++;
+                    }
+
+                    while (occupied(hashedKey) && hashedKey != stopIndex) {
+                        hashedKey = (hashedKey + 1) % hashtable.length;
+                    }
+                }
+
+                if (occupied(hashedKey)) {
+                    System.out.println("Sorry, there's already an employee at position " + hashedKey);
+                } else {
+                    hashtable[hashedKey] = new StoredEmployee(key, employee);
+                }
+            }
+
+            public Employee get(String key) {
+                int hashedKey = findKey(key);
+                //if (hashtable[hashedKey] == null) {
+                //    System.out.println("Sorry, there's not any employee at this position");
+                //    return null;
+                //}
+
+                if (hashedKey == -1) {
+                    return null;
+                }
+
+                return hashtable[hashedKey].employee;
+            }
+
+            private int findKey(String key) {
+                int hashedKey = hashKey(key);
+                if (hashtable[hashedKey] != null
+                && hashtable[hashedKey].key.equals(key)) {
+                    return hashedKey;
+                }
+
+                int stopIndex = hashedKey;
+                if (hashedKey == hashtable.length - 1) {
+                    hashedKey = 0;
+                } else {
+                    hashedKey++;
+                }
+
+                while (hashedKey != stopIndex &&
+                        !hashtable[hashedKey].key.equals(key)) {
+                    hashedKey = (hashedKey + 1) % hashtable.length;
+                }
+
+                if (hashtable[hashedKey] != null && hashtable[hashedKey].key.equals(key)) {
+                    return hashedKey;
+                } else {
+                    return -1;
+                }
+            }
+
+
+            private int hashKey(String key) {
+                return key.length() % hashtable.length;
+            }
+
+            private boolean occupied(int index) {
+                return hashtable[index] != null;
+            }
+
+            public void printHashtable() {
+                for (int i = 0; i < hashtable.length; i++) {
+                    if (hashtable[i] == null) {
+                        System.out.println("Position " + i + " is empty");
+                    } else {
+                        System.out.println("Position " + i + " " + hashtable[i].employee);
+                    }
+                }
+            }
+
+            public Employee remove(String key) {
+                int hashedKey = findKey(key);
+                if (hashedKey == -1) {
+                    return null;
+                }
+
+                Employee employee = hashtable[hashedKey].employee;
+                hashtable[hashedKey] = null;
+
+
+                StoredEmployee[] oldHashtable = hashtable;
+                hashtable = new StoredEmployee[oldHashtable.length];
+                for (int i = 0; i < oldHashtable.length; i++) {
+                    if (oldHashtable[i] != null) {
+                        put(oldHashtable[i].key, oldHashtable[i].employee);
+                    }
+                }
 
 
 
+                return employee;
+            }
+        }
+
+        SimpleHashTable simpleHashTable = new SimpleHashTable(10);
+        simpleHashTable.put("Jones", janeJones);
+        simpleHashTable.put("Doe", johnDoe);
+        simpleHashTable.put("Wilson", mikeWilson);
+        //simpleHashTable.put("Smith", marySmith); -- error
+
+        simpleHashTable.printHashtable();
+
+        System.out.println("Retrieve key Wilson: " + simpleHashTable.get("Wilson"));
+
+
+        System.out.println("----> (HashTables) Handling collisions <----");
+
+        // Linear Probing
+
+        simpleHashTable.put("Smith", marySmith);
+        simpleHashTable.printHashtable();
+
+        System.out.println("Retrieve key Smith: " + simpleHashTable.get("Smith"));
+
+
+        //class StoredEmployee {
+        //public String key;
+        //public Employee employee;
+        //
+        //          public StoredEmployee(String key, Employee employee) {
+        //        this.key = key;
+        //        this.employee = employee;
+        //    }
+        //}
+
+        // Linear Probing - removing items
+
+        simpleHashTable.remove("Wilson");
+        simpleHashTable.remove("Jones");
+        simpleHashTable.printHashtable();
+
+        // Rehashing
+
+        simpleHashTable.remove("Doe");
+        System.out.println("After rehashing: ");
+        simpleHashTable.printHashtable();
+
+        System.out.println("Retrieve key Smith: " + simpleHashTable.get("Smith"));
+
+
+        System.out.println("HashTables Challenge 2)");
+        // Hashtables Challenge 2)
+        // Remove duplicate items from a linked list
+        // Your solution must use the jdk's LinkedList class
+        // Your solution must use a HashMap
+        HashMap<Integer, Employee> employees1 = new HashMap<>();
+        employees1.put(1, johnDoe);
+        employees1.put(2, marySmith);
+        employees1.put(3, janeJones);
+        employees1.put(1, johnDoe);
+        HashMap<Integer, Employee> hashMap = new HashMap<>();
+        List<Employee> remove = new ArrayList<>();
+        employees1.entrySet().forEach(entry -> {
+            if (hashMap.containsKey(entry.getKey())) {
+                remove.add(entry.getValue());
+            } else {
+                hashMap.put(entry.getKey(), entry.getValue());
+            }
+        });
+
+        for (Employee emp : remove) {
+            employees1.remove(emp);
+        }
+
+        employees1.values().forEach(System.out::println);
+
+        System.out.println(recursiveF(3, 5));
+
+        int n = 841;
+        int x = 1;
+        for (int i = 0; i < 50; i++) {
+            int nx = (x + n / x) / 2;
+            x = nx;
+        }
+        System.out.println("X: " + x);
+
+        System.out.println("Count values for " + countValues(256));
+
+
+
+
+        //class ItemSeparator {
+        //    private String itemName;
+        //    private double price;
+        //    private int quantity;
+//
+        //    public ItemSeparator(String rawInput) {
+        //        handleRawInput(rawInput);
+        //    }
+//
+        //    public ItemSeparator(String itemName, double price, int quantity) {
+        //        this.itemName = itemName;
+        //        this.price = price;
+        //        this.quantity = quantity;
+        //    }
+//
+        //    public String getName() {
+        //        return this.itemName;
+        //    }
+//
+        //    public double getPrice() {
+        //        return this.price;
+        //    }
+//
+        //    public int getQuantity() {
+        //        return this.quantity;
+        //    }
+//
+        //    private void handleRawInput(String rawInput) {
+        //        String[] stringSplitted = rawInput.split("$$##");
+        //        this.itemName = stringSplitted[0];
+        //        this.price = Double.parseDouble(stringSplitted[1]);
+        //        this.quantity = Integer.parseInt(stringSplitted[2]);
+        //    }
+        //}
+
+        //ItemSeparator itemData = new ItemSeparator("Bread$$##12.5$$##10");
+        //System.out.println("Item Name: " + itemData.getName());
+        //System.out.println("Item Price: " + itemData.getPrice());
+        //System.out.println("Item Quantity: " + itemData.getQuantity());
+
+        System.out.println("----> Search Algorithms <----");
+
+        System.out.println("----> Linear Search Algorithm <----");
+        System.out.println(linearSearch(arrayList(), 3));
+        System.out.println(linearSearch(arrayList(), 10));
+        System.out.println(linearSearch(arrayList(), -1));
+
+        System.out.println("----> Binary Search Algorithm <----");
+
+        // Data must be sorted!
+        // Chooses the element in the middle of the array and compares it against the search value
+        // if element is equal to the value, we're done
+        // If element is greater than the value, search the left half of the array
+        // If the element is less than the value, search the right half of the array
+
+        System.out.println("iterative way");
+
+        System.out.println(iterativeBinarySearch(Arrays.stream(arrayList()).sorted().toArray(), 4));
+        System.out.println(iterativeBinarySearch(Arrays.stream(arrayList()).sorted().toArray(), 6));
+        System.out.println(iterativeBinarySearch(Arrays.stream(arrayList()).sorted().toArray(), 10));
+
+        System.out.println("Recursive way");
+        int[] intarray = Arrays.stream(arrayList()).sorted().toArray();
+        System.out.println(recursiveBinarySearch(intarray, 0, intarray.length, -1));
+        System.out.println(recursiveBinarySearch(intarray, 0, intarray.length, 15));
+        System.out.println(recursiveBinarySearch(intarray, 0, intarray.length, 6));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+    public static int recursiveBinarySearch(int[] input, int start, int end, int value) {
+        if (start >= end) {
+            return -1;
+        }
+
+        int midpoint = (start + end) / 2;
+        System.out.println("midpoint = " + midpoint);
+
+        if (input[midpoint] == value) {
+            return midpoint;
+        } else if (input[midpoint] < value) {
+            recursiveBinarySearch(input, midpoint + 1, end, value);
+        } else if (input[midpoint] > value) {
+            recursiveBinarySearch(input, start, midpoint, value);
+        }
+
+        return -1;
+    }
+
+    public static int iterativeBinarySearch(int[] input, int value) {
+        int start = 0;
+        int end = input.length;
+
+        while (start < end) {
+            int midpoint = (start + end) / 2;
+            System.out.println("midpoint = " + midpoint);
+            if (input[midpoint] == value) {
+                return midpoint;
+            } else if (input[midpoint] < value) {
+                start = midpoint + 1;
+            } else if (input[midpoint] > value) {
+                end = midpoint;
+            }
+        }
+        return -1;
+    }
+
+    public static int linearSearch(int[] input, int value) {
+        for (int i = 0; i < input.length; i++) {
+            if (input[i] == value) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int countValues(int n) {
+        int count = 0;
+        for (int i = 0; i <= n; i++) {
+            for (int j = i; j <= n; j++) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+
+    public static int recursiveF(int a, int b) {
+        if (b == 0) {
+            return 1;
+        }
+        int temp = recursiveF(a, b / 2);
+        if (b % 2 != 0) {
+            return temp * temp * a;
+        } else {
+            return temp * temp;
+        }
     }
 
     public static boolean checkForPalindromeQueueAndStack(String string) {
