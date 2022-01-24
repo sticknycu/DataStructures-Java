@@ -1384,16 +1384,16 @@ public class Main {
         employees1.values().forEach(System.out::println);
 
         System.out.println(recursiveF(3, 5));
-
-        int n = 841;
-        int x = 1;
-        for (int i = 0; i < 50; i++) {
-            int nx = (x + n / x) / 2;
-            x = nx;
-        }
-        System.out.println("X: " + x);
-
-        System.out.println("Count values for " + countValues(256));
+//
+        //int n = 841;
+        //int x = 1;
+        //for (int i = 0; i < 50; i++) {
+        //    int nx = (x + n / x) / 2;
+        //    x = nx;
+        //}
+        //System.out.println("X: " + x);
+//
+        //System.out.println("Count values for " + countValues(256));
 
 
 
