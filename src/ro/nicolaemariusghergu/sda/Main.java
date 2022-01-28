@@ -1,5 +1,7 @@
 package ro.nicolaemariusghergu.sda;
 
+import com.sun.source.tree.Tree;
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -1465,21 +1467,306 @@ public class Main {
         System.out.println(recursiveBinarySearch(intarray, 0, intarray.length, 15));
         System.out.println(recursiveBinarySearch(intarray, 0, intarray.length, 6));
 
+        System.out.println("----> Trees <----");
+        // every circle is called a node
+        // nodes can have childrens
+        // a node can have only a parent
+        // the node at the top of the tree is the root
+        // a leaf node has no children
+        // a singleton tree has only one node - the root
+        // depth of a node is the number of edges
+        // root have depth 0
+        // and etc etc
+        // heigth of a tree is the number of edges of the longest path from a root to a leaf
+        // leaf nodes will have a heigth of 0
+
+        System.out.println("----> Binary Search Trees <----");
+        // every node has 0,1 or 2 children
+        // children are referred to as left child and right child
+        // in practice, we use binary search trees
+
+        // complete tree - every level except the last level
+        // is completly filled
+
+        // complete binary tree - every level except the last must have 2 childrens
+
+        // can perform insertions, deletions and retrievals in O(logn) time
+        // the left child always has a smaller value  than its parent
+        // the right child always has a larger value than its parent
+        // this means everything to the left of the root is less than the
+        // value of the root and everything to the right of the root is greater than the value of the root
+        // because of that, we can do a binary search
+
+        // AVL trees and red-black trees are the most common trees which are balancing automaticaly
+        // they shift elements when they are going to whack
+
+        // so: a good way for using a binary tree is when you don't have much difference between left side and right side
+        // because if elements are ordered, you will have a linked list , so search will be in O(n) not O(logn), duh?
+
+        // the maximum is on the right side and minimum on the left side
+
+
+        class TreeNode {
+            private int data;
+            private TreeNode leftChild;
+            private TreeNode rightChild;
+
+            public TreeNode(int data) {
+                this.data = data;
+            }
+
+            public TreeNode get(int value) {
+                if (value == data) {
+                    return this;
+                }
+
+                if (value < data) {
+                    if (leftChild != null) {
+                        return leftChild.get(value);
+                    }
+                } else {
+                    if (rightChild != null) {
+                        return rightChild.get(value);
+                    }
+                }
+
+                return null;
+            }
+
+            public void insert(int value) {
+                if (value == data) {
+                    return;
+                }
+
+                if (value < data) {
+                    if (leftChild == null) {
+                        leftChild = new TreeNode(value);
+                    } else {
+                        leftChild.insert(value);
+                    }
+                } else {
+                    if (rightChild == null) {
+                        rightChild = new TreeNode(value);
+                    } else {
+                        rightChild.insert(value);
+                    }
+                }
+            }
+
+            public void traversalInOrder() {
+                if (leftChild != null) {
+                    leftChild.traversalInOrder();
+                }
+                System.out.print(", " + data);
+
+                if (rightChild != null) {
+                    rightChild.traversalInOrder();
+                }
+            }
+
+            public int min() {
+                if (leftChild == null) {
+                    return data;
+                } else {
+                    return leftChild.min();
+                }
+            }
+
+            public int max() {
+                if (rightChild == null) {
+                    return data;
+                } else {
+                    return rightChild.max();
+                }
+            }
+
+            public int getData() {
+                return data;
+            }
+
+            public void setData(int data) {
+                this.data = data;
+            }
+
+            public TreeNode getLeftChild() {
+                return leftChild;
+            }
+
+            public void setLeftChild(TreeNode leftChild) {
+                this.leftChild = leftChild;
+            }
+
+            public TreeNode getRightChild() {
+                return rightChild;
+            }
+
+            public void setRightChild(TreeNode rightChild) {
+                this.rightChild = rightChild;
+            }
+        }
+
+        class Tree {
+            private TreeNode root;
+
+            public void insert(int value) {
+                if (root == null) {
+                    root = new TreeNode(value);
+                } else {
+                    root.insert(value);
+                }
+            }
+
+            public void traverseInOrder() {
+                if (root != null) {
+                    root.traversalInOrder();
+                }
+            }
+
+            public TreeNode get(int value) {
+                if (root != null) {
+                    return root.get(value);
+                }
+
+                return null;
+            }
+
+            public int min() {
+                if (root == null) {
+                    return Integer.MIN_VALUE;
+                } else {
+                    return root.min();
+                }
+            }
+
+            public int max() {
+                if (root == null) {
+                    return Integer.MAX_VALUE;
+                } else {
+                    return root.max();
+                }
+            }
+
+            public void delete(int value) {
+                root = delete(root, value);
+            }
+
+            private TreeNode delete(TreeNode subtreeRoot, int value) {
+                if (subtreeRoot == null) {
+                    return subtreeRoot;
+                }
+                if (value < subtreeRoot.getData()) {
+                    subtreeRoot.setLeftChild(delete(subtreeRoot.getLeftChild(), value));
+                } else if (value > subtreeRoot.getData()) {
+                    subtreeRoot.setRightChild(delete(subtreeRoot.getRightChild(), value));
+                } else {
+                    // Cases 1 and 2: node to delete has 0 or 1 children
+                    if (subtreeRoot.getLeftChild() == null) {
+                        return subtreeRoot.getRightChild();
+                    } else if (subtreeRoot.getRightChild() == null) {
+                        return subtreeRoot.getLeftChild();
+                    }
+                    // Case 3: node to delete has 2 children
+
+                    // Replace the value in the subtreeRoot node with the smallest value
+                    // from the right subtree
+                    subtreeRoot.setData(subtreeRoot.getRightChild().min());
+
+                    // Delete the node that has the smallest value in the right subtree
+                    subtreeRoot.setRightChild(delete(subtreeRoot.getRightChild(), subtreeRoot.getData()));
+                }
+
+                return subtreeRoot;
+            }
+
+
+        }
+
+        Tree tree = new Tree();
+        tree.insert(25);
+        tree.insert(20);
+        tree.insert(15);
+        tree.insert(27);
+        tree.insert(30);
+        tree.insert(29);
+        tree.insert(26);
+        tree.insert(22);
+        tree.insert(32);
+
+        // traversal
+
+        // Level - visit nodes on each level
+        // Pre-order - visit the root of every subtree first
+        // In-order - visit left child, then root, then right child
+        // Post-order - visit the root of every subtree last
+
+
+        // level : 25, 20, 27, 15, 22, 26, 30, 29, 32
+
+        // pre order: 25, 20, 15, 22, 27, 26, 30, 29, 32
+
+        // in order: 15, 20, 22, 25, 26, 27, 29, 30, 32
+
+        // post order: 15, 22, 20, 26, 29, 32, 30, 27, 25
+        System.out.println("== Traverse In-Order ==");
+        tree.traverseInOrder();
+        System.out.println();
+
+        System.out.println(tree.get(27));
+        System.out.println(tree.get(17));
+        System.out.println(tree.get(8888));
+
+        System.out.println();
+
+        System.out.println("Min= " + tree.min());
+        System.out.println("Max= " + tree.max());
+
+        // Delete
+        // 1. Node is a leaf
+        // 2. Node has one child
+        // 3. Node has two children
 
 
 
+        // Delete node with two children
+        // Need to figure out what the replacement node will be
+        // Want minimal disruption to the existing tree structure
+        // Can take the replacement node from the deleted node's left subtree
+        // or right subtree
+        // If taking it from the left subtree, we have to take the largest value in the left subtree
+        // if taking it from the right subtree, we have to take the smallest value
+        // in the right subtree
+        // Choose one and stick to it
 
 
+        System.out.println("=== Deleting ===");
+        System.out.println("case 2");
+        tree.delete(15);
+        tree.traverseInOrder();
+        System.out.println();
+
+        System.out.println("case 1");
+        tree.delete(27);
+        tree.traverseInOrder();
+        System.out.println();
+
+        System.out.println("case 3");
+        tree.delete(25);
+        tree.traverseInOrder();
+        System.out.println();
+
+        System.out.println("case when node does not exist");
+        tree.delete(8888);
+        tree.traverseInOrder();
+        System.out.println();
 
 
+        // JDK Classes
 
+        // TreeMap -- Red-Black Tree based
+        // get,put,remove - log(n)
+        // not syncronised - use collections
 
-
-
-
-
-
-
+        // TreeSet - based on TreeMap
 
 
 
